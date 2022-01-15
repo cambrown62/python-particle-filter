@@ -1,11 +1,15 @@
-import csv
+#import csv
+from random import sample
+import pandas as pd
 import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-func_range = 100
+kf = 20
+sample_freq = 2
+num_samples = sample_freq*kf
 
-x = np.linspace(0, 20, 10000)
+x = np.linspace(0, kf, 10000)
 y = []
 
 for num in x:
@@ -18,26 +22,29 @@ plt.show()
 
 filename = 'measurement_data.csv'
 
-with open(filename, 'w') as f:
-    write = csv.writer(f)
-    for val in y:
-        write.writerow([val])
+y_df = pd.DataFrame(y)
 
-y_read = []
+y_df.to_csv(filename)
 
-with open(filename, 'r') as f:
-    reader = csv.reader(f)
-    for row in reader:
-        y_read.append(row)
+y_read = pd.read_csv(filename) 
 
 #print(y_read)
 
-y_delta = np.subtract(np.array(y), np.array(y_read))
 
+
+'''
+for i in range(len(y_read)):
+    temp = y_read[i][0]
+    del y_read[i]
+    y_read[i] = temp
+'''
+
+#print(y_read[0][0])
+#print(y_read[0])
 '''
 y_delta = []
 for written, read in zip(y, y_read):
-    y_delta.append(read-written)
-'''
-print(np.mean(y_delta))
+    y_delta.append(read - written)
+    '''
+#print(np.mean(y_delta))
 
