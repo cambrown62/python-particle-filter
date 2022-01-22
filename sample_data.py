@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from params import *
 
 def sample_data(data, sample_rate, msmt_cov, Ts):
     out = []
@@ -12,14 +13,12 @@ def sample_data(data, sample_rate, msmt_cov, Ts):
 
 filename = 'real_data.csv'
 theta_df = pd.read_csv(filename)
-#print(theta)
 theta = theta_df['0'].tolist()
-#print(theta)
-Ts = 0.00001
-tF = 5
-sample_rate = Ts*1000
-cov = 0.03
-z = sample_data(theta, sample_rate, cov, Ts)
+#Ts = 0.00001
+#tF = 5
+#sample_rate = Ts*1000
+#cov = 0.03
+z = sample_data(theta, Ts, msmt_cov, Ts_sim)
 #print(len(z))
 t = np.linspace(0,tF,len(z))
 plt.plot(t, z)
