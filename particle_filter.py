@@ -1,3 +1,5 @@
+from random import weibullvariate
+from matplotlib.font_manager import _Weight
 import numpy as np
 import matplotlib.pyplot as plt
 from params import *
@@ -27,7 +29,34 @@ class ParticleFilter:
             particle.weight /= sum
 
     def EstimateState(self):
+        self.theta_hat = np.average(self.particles.theta, self.particles.weight)
 
+    def Resample(self):
+        r =  np.random.uniform()
+        cumsum = 0
+        resampled_particles = []
+        i = 0
+        idx = 0
+        bounds = []
+        for i in range(len(self.particles)):
+            bounds[i] = [cumsum, cumsum+self.particles[i].weight]
+            if r > bounds[i][0] and r < bounds[i][1]:
+                idx = i
+                resampled_particles.append(self.particles[i])
+            cumsum += self.particles[i].weight
+
+        interval = cumsum / self.N 
+        while len(resampled_particles) < self.N:
+            r += interval
+            if r > bounds[idx][0] or r < bounds[idx][1]:
+                resampled_particles.append(self.particles[idx])
+            else:
+                idx += 1
+            if idx > self.N: 
+                idx = 0
+            
+        self.particles = resampled_particles
+            
 
 
 class Particle:
