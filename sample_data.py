@@ -23,3 +23,7 @@ z = sample_data(theta, Ts, msmt_cov, Ts_sim)
 t = np.linspace(0,tF,len(z))
 plt.plot(t, z)
 plt.show()
+
+theta_df = pd.DataFrame(z)
+filename = 'measurement_data.csv'
+theta_df.to_csv(filename)

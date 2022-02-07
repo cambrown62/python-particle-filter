@@ -8,4 +8,5 @@ tF = 5              # length of time to sim pendulum
 theta0 = np.pi/16   # initial theta of pendulum   
 theta_dot0 = 0      # initial angular velocity of pendulum
 msmt_cov = 0.03     # covariance of measurement data
-proc_cov = 0.07      # covariance of process
+proc_cov = 0.07     # covariance of process
+num_particles = 1000  # number of particles

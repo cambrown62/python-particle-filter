@@ -28,7 +28,7 @@ def sim_pendulum(l, Ts, tF, theta0, theta_dot0):
 
     return theta, theta_dot
 
-theta, thetadot = sim_pendulum(l, Ts_sim, tF, theta0)
+theta, thetadot = sim_pendulum(l, Ts_sim, tF, theta0, theta_dot0)
 t = np.linspace(0, tF, int(np.round(tF/Ts_sim)))
 plt.plot(t, theta)
 plt.show()
