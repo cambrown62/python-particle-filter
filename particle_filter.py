@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from params import *
+import sys
+import copy
 
 class ParticleFilter:
     def __init__(self, Ts, theta0, theta_dot0=0, N=1000):
@@ -17,29 +19,26 @@ class ParticleFilter:
     def PropogateState(self):
         proc_stdev = np.sqrt(proc_cov)
         for particle in self.particles:
-            particle.theta = particle.theta_prev + particle.theta_dot_prev*self.Ts + np.random.normal(0, proc_stdev)
-            particle.theta_dot = particle.theta_dot_prev + g/l*np.sin(particle.theta_prev)*Ts + np.random.normal(proc_stdev)
+            theta_noise = np.random.normal(0, proc_stdev)
+            theta_dot_noise = np.random.normal(0, proc_stdev)
+            particle.theta = particle.theta_prev + particle.theta_dot_prev*self.Ts + theta_noise
+            particle.theta_dot = particle.theta_dot_prev + g/l*np.sin(particle.theta_prev)*Ts + theta_dot_noise
+            particle.theta_prev = particle.theta
+            particle.theta_dot_prev = particle.theta_dot
 
     def CalcWeights(self, z):
         msmt_stdev = np.sqrt(msmt_cov)
         sum = 0
         for particle in self.particles:
-            particle.weight = np.exp(-0.5 * (z - particle.theta)**2/msmt_stdev**2)/msmt_stdev/np.sqrt(2*np.pi) 
+            particle.weight = np.exp(-0.5 * (z - particle.theta)**2/msmt_stdev**2)/(msmt_stdev*np.sqrt(2*np.pi)) 
             sum += particle.weight
 
-        #newsum = 0
         self.weightsum = 0
         for particle in self.particles:
             particle.weight /= sum
+            if particle.weight == 0:
+                particle.weight = sys.float_info.epsilon
             self.weightsum += particle.weight 
-        #    newsum += particle.weight
-
-        
-
-        #while newsum != 1:
-         #   i = np.random.randint(0, self.num_particles)
-          #  self.particles[i].weight += (1.0 - newsum)
-           # newsum += (1-newsum) 
 
     def EstimateState(self):
         EV = 0
@@ -60,7 +59,7 @@ class ParticleFilter:
         temp = np.random.multinomial(len(self.particles), weights)
         for i in range(len(temp)):
             for j in range(temp[i]):
-                resamp_parts.append(self.particles[i])
+                resamp_parts.append(copy.deepcopy(self.particles[i]))
 
         self.particles = resamp_parts
         
@@ -91,10 +90,8 @@ class ParticleFilter:
         self.particles = resampled_particles
             
     def RunFilter(self, z):
-        #pdb.set_trace()
         self.PropogateState()
         self.CalcWeights(z)
-        #pdb.set_trace()
         self.EstimateState()
         self.MultinomialResample()
         return self.theta_hat
@@ -111,20 +108,13 @@ z = z_df['0'].tolist()
 
 pf = ParticleFilter(Ts, theta0, theta_dot0, num_particles)
 
-
 theta_hat = []
-#for i in range(len(z)):
-    #for particle in pf.particles:
-    #print(particle.theta)
-    #theta_hat.append(pf.RunFilter(z[i]))
-    #print(pf.particles[:].theta)
 
 for i in range(len(z)):
-    #print(i) 
-    print(pf.weightsum)
     theta_hat.append(pf.RunFilter(z[i]))
 
-#t = np.linspace(0, tF, len(theta_hat))
-#plt.plot(t, theta_hat)
-#plt.show()
+t = np.linspace(0, tF, len(theta_hat))
+plt.plot(t, theta_hat)
+plt.plot(t, z)
+plt.show()
 
