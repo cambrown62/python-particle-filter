@@ -1,7 +1,5 @@
 import pdb
 import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
 from params import *
 import sys
 import copy
@@ -101,20 +99,3 @@ class Particle:
         self.theta = self.theta_prev = theta0
         self.theta_dot = self.theta_dot_prev = theta_dot0
         self.weight = weight0
-
-filename = 'measurement_data.csv'
-z_df = pd.read_csv(filename)
-z = z_df['0'].tolist()
-
-pf = ParticleFilter(Ts, theta0, theta_dot0, num_particles)
-
-theta_hat = []
-
-for i in range(len(z)):
-    theta_hat.append(pf.RunFilter(z[i]))
-
-t = np.linspace(0, tF, len(theta_hat))
-plt.plot(t, theta_hat)
-plt.plot(t, z)
-plt.show()
-
